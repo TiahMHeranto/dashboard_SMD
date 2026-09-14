@@ -1,0 +1,7 @@
+﻿Cluster,Segment,n_clients,pct_clients,pct_CA,age_moyen,depense_totale_usd,nb_achats,recence_j,panier_moyen_usd,accessoires,vetements,chaussures,outerwear,pct_in_store,pct_femmes,pct_recence_gt_90j
+4,VIP / Champions,463,11.6,41.4,33.7,3192.0,34.89,18.0,92.99,24.0,46.0,21.0,9.0,27.0,55.0,0.6
+5,Online reguliers (Clothing),1783,44.6,33.2,34.1,664.0,7.73,65.0,84.72,18.0,59.0,18.0,6.0,0.0,54.0,21.6
+2,In-Store reguliers,944,23.6,19.8,33.5,750.0,8.74,61.0,85.56,20.0,55.0,19.0,7.0,100.0,52.0,21.7
+0,Petits dormants (Accessoires),393,9.8,2.3,33.6,206.0,2.9,115.0,65.35,77.0,12.0,9.0,2.0,23.0,55.0,41.0
+3,Gros paniers occasionnels (Outerwear),145,3.6,1.8,34.0,444.0,2.79,156.0,179.18,17.0,16.0,12.0,55.0,25.0,57.0,66.2
+1,Chaussures ponctuels,272,6.8,1.5,33.6,192.0,2.11,99.0,93.53,3.0,7.0,88.0,1.0,25.0,53.0,34.6

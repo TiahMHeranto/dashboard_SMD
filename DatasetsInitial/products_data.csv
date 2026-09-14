@@ -1,0 +1,21 @@
+Product_ID,Product_Name,Category,Price,Brand
+101,T-shirt,Clothing,25.0,Brand A
+102,Jeans,Clothing,75.0,Brand B
+103,Sneakers,Footwear,30.0,Brand C
+104,Jacket,Outerwear,120.0,Brand D
+105,Hat,Accessories,22.5,Brand E
+106,Hoodie,Clothing,55.0,Brand A
+107,Dress Shirt,Clothing,45.0,Brand B
+108,Summer Dress,Clothing,65.0,Brand E
+109,Shorts,Clothing,35.0,Brand A
+110,Sweater,Clothing,60.0,Brand D
+111,Running Shoes,Footwear,90.0,Brand C
+112,Boots,Footwear,110.0,Brand D
+113,Sandals,Footwear,28.0,Brand E
+114,Coat,Outerwear,180.0,Brand D
+115,Windbreaker,Outerwear,85.0,Brand B
+116,Belt,Accessories,32.0,Brand B
+117,Scarf,Accessories,24.0,Brand E
+118,Sunglasses,Accessories,48.0,Brand A
+119,Backpack,Accessories,70.0,Brand C
+120,Watch,Accessories,150.0,Brand D

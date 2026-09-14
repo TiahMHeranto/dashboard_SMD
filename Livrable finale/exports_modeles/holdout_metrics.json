@@ -1,0 +1,35 @@
+{
+  "churn": {
+    "auc": 0.6977142857142857,
+    "seuil": 0.27,
+    "precision": 0.06097560975609756,
+    "rappel": 0.23809523809523808,
+    "f1": 0.0970873786407767,
+    "n_pred_churn": 82,
+    "n_vrai_churn": 21,
+    "tn": 423,
+    "fp": 77,
+    "fn": 16,
+    "tp": 5
+  },
+  "clv": {
+    "mae": 354.8387982212856,
+    "rmse": 479.5361009277868,
+    "r2": 0.6057492378555753,
+    "mae_baseline": 531.1368662704858,
+    "r2_baseline": -0.0014180298368635658
+  },
+  "selection": {
+    "churn_model": "Random Forest balanced",
+    "clv_model": "Random Forest",
+    "churn_threshold": 0.27
+  },
+  "n_scores": 4000,
+  "n_risk_eleve": 409,
+  "n_winback_prioritaire": 205,
+  "snapshot": "2026-07-31",
+  "pkl": {
+    "churn": "Z:\\GithubProject\\SMD\\ProjetFinal\\Livrable finale\\modeles\\churn_model.pkl",
+    "clv": "Z:\\GithubProject\\SMD\\ProjetFinal\\Livrable finale\\modeles\\clv_model.pkl"
+  }
+}
