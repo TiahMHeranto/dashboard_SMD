@@ -65,6 +65,7 @@ class DashboardBundle:
     campaigns: pd.DataFrame
     by_channel: pd.DataFrame
     monthly: pd.DataFrame
+    monthly_by_segment: pd.DataFrame
     profiles: pd.DataFrame
     strategy: pd.DataFrame
     mix: pd.DataFrame
@@ -126,6 +127,22 @@ def _monthly_sales(sales: pd.DataFrame) -> pd.DataFrame:
         .agg(revenue=("Sale_Price", "sum"), orders=("Sale_ID", "count"))
         .reset_index()
     )
+    return monthly
+
+
+def _monthly_sales_by_segment(sales: pd.DataFrame, scores: pd.DataFrame) -> pd.DataFrame:
+    """Chiffre d'affaires mensuel ventilé par profil client, pour le détail interactif."""
+    s = sales.copy()
+    s["Date"] = pd.to_datetime(s["Date"])
+    seg_map = scores.set_index("Customer_ID")["Segment"]
+    s["Segment"] = s["Customer_ID"].map(seg_map)
+    s = s.dropna(subset=["Segment"])
+    monthly = (
+        s.groupby(["Segment", pd.Grouper(key="Date", freq="ME")])
+        .agg(revenue=("Sale_Price", "sum"), orders=("Sale_ID", "count"))
+        .reset_index()
+    )
+    monthly["Segment_Label"] = monthly["Segment"].map(SEGMENT_LABELS).fillna(monthly["Segment"])
     return monthly
 
 
@@ -260,6 +277,7 @@ def load_bundle() -> DashboardBundle:
     campaigns = _campaign_kpis(camps_raw)
     by_channel = _by_channel(campaigns)
     monthly = _monthly_sales(sales)
+    monthly_by_segment = _monthly_sales_by_segment(sales, scores)
 
     view = scores.merge(
         customers_raw[["Customer_ID", "Age", "Gender", "Location", "Join_Date"]],
@@ -324,6 +342,7 @@ def load_bundle() -> DashboardBundle:
         campaigns=campaigns,
         by_channel=by_channel,
         monthly=monthly,
+        monthly_by_segment=monthly_by_segment,
         profiles=profiles,
         strategy=strategy,
         mix=mix,

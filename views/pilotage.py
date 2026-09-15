@@ -18,23 +18,33 @@ from lib.constants import (
     SNAPSHOT_LABEL,
 )
 from lib.data import money, nfmt, pct
-from views.components import filter_header, page_header, section_header, style_chart
+from views.components import (
+    active_filters_summary,
+    filter_header,
+    kpi_row,
+    page_header,
+    section_header,
+    style_chart,
+)
 
-
-def kpi_row(items: list[tuple[str, str]]) -> None:
-    cols = st.columns(len(items))
-    for col, (label, value) in zip(cols, items):
-        col.metric(label, value)
+FILTER_KEYS = [
+    "filter_segments",
+    "filter_risks",
+    "filter_locations",
+    "filter_categories",
+]
 
 
 def _clear_pilotage_filters() -> None:
-    for key in [
-        "filter_segments",
-        "filter_risks",
-        "filter_locations",
-        "filter_categories",
-    ]:
+    for key in FILTER_KEYS:
         st.session_state[key] = []
+
+
+def _apply_quick_filter(risks: list[str], segments: list[str]) -> None:
+    st.session_state["filter_risks"] = risks
+    st.session_state["filter_segments"] = segments
+    st.session_state["filter_locations"] = []
+    st.session_state["filter_categories"] = []
 
 
 def _filter(
@@ -77,52 +87,100 @@ def render_pilotage() -> None:
     categories = sorted(data.customers["Favorite_Category"].dropna().unique().tolist())
 
     with st.sidebar:
-        filter_keys = [
-            "filter_segments",
-            "filter_risks",
-            "filter_locations",
-            "filter_categories",
-        ]
-        active_count = sum(bool(st.session_state.get(key, [])) for key in filter_keys)
-        filter_header(active_count)
-        chosen_segments = st.multiselect(
+        section_header("Profils clients", "customers")
+        chosen_segments = st.pills(
             "Profils clients",
             segments,
-            placeholder="Tous les profils",
+            selection_mode="multi",
             format_func=lambda s: SEGMENT_LABELS.get(s, s),
+            width="stretch",
+            label_visibility="collapsed",
             key="filter_segments",
         )
-        risk = st.multiselect(
-            "Niveaux de risque d'attrition",
-            risk_options,
-            placeholder="Tous les niveaux",
-            format_func=lambda r: RISK_LABELS.get(r, r),
-            key="filter_risks",
+        st.caption("Filtre les données du tableau de bord principal.")
+
+    active_count = sum(bool(st.session_state.get(key, [])) for key in FILTER_KEYS)
+
+    with st.container(key="pilotage_filter_bar", border=True):
+        top_l, top_q1, top_q2, top_q3, top_snap = st.columns(
+            [2.1, 1, 1, 1, 1.7], gap="small", vertical_alignment="center"
         )
-        chosen_locations = st.multiselect(
-            "Zones géographiques",
-            locations,
-            placeholder="Toutes les zones",
-            key="filter_locations",
-        )
-        chosen_categories = st.multiselect(
-            "Catégories préférées",
-            categories,
-            placeholder="Toutes les catégories",
-            key="filter_categories",
-        )
-        active_count = sum(
-            bool(value)
-            for value in [chosen_segments, risk, chosen_locations, chosen_categories]
-        )
-        st.button(
-            "Effacer les filtres",
-            icon=":material/filter_alt_off:",
-            width="stretch",
-            disabled=active_count == 0,
-            on_click=_clear_pilotage_filters,
-        )
-        st.caption(f"Photographie client mise à jour le {SNAPSHOT_LABEL}")
+        with top_l:
+            filter_header(active_count)
+        with top_q1:
+            st.button(
+                "Tout",
+                icon=":material/select_all:",
+                width="stretch",
+                on_click=_clear_pilotage_filters,
+            )
+        with top_q2:
+            st.button(
+                "À risque",
+                icon=":material/warning:",
+                width="stretch",
+                on_click=_apply_quick_filter,
+                args=(["Eleve"], []),
+            )
+        with top_q3:
+            st.button(
+                "VIP",
+                icon=":material/star:",
+                width="stretch",
+                on_click=_apply_quick_filter,
+                args=([], ["VIP / Champions"]),
+            )
+        with top_snap:
+            st.caption(f"Photo au {SNAPSHOT_LABEL}")
+
+        f1, f2, f3 = st.columns(3, gap="large")
+        with f1:
+            risk = st.pills(
+                "Niveau de risque d'attrition",
+                risk_options,
+                selection_mode="multi",
+                format_func=lambda r: RISK_LABELS.get(r, r),
+                width="stretch",
+                key="filter_risks",
+            )
+        with f2:
+            chosen_locations = st.multiselect(
+                "Zones géographiques",
+                locations,
+                placeholder="Toutes les zones",
+                key="filter_locations",
+            )
+        with f3:
+            chosen_categories = st.pills(
+                "Catégories préférées",
+                categories,
+                selection_mode="multi",
+                width="stretch",
+                key="filter_categories",
+            )
+
+        bottom_l, bottom_r = st.columns([4, 1.3], gap="medium", vertical_alignment="center")
+        with bottom_l:
+            active_filters_summary(
+                [
+                    ("Profil", [SEGMENT_LABELS.get(s, s) for s in chosen_segments]),
+                    ("Risque", [RISK_LABELS.get(r, r) for r in risk]),
+                    ("Zone", list(chosen_locations)),
+                    ("Catégorie", list(chosen_categories)),
+                ]
+            )
+        with bottom_r:
+            active_count = sum(
+                bool(value)
+                for value in [chosen_segments, risk, chosen_locations, chosen_categories]
+            )
+            st.button(
+                "Effacer les filtres",
+                icon=":material/filter_alt_off:",
+                width="stretch",
+                disabled=active_count == 0,
+                on_click=_clear_pilotage_filters,
+            )
 
     view, scored_view = _filter(
         data.customers,
@@ -140,12 +198,12 @@ def render_pilotage() -> None:
 
     tabs = st.tabs(
         [
-            "Vue d'ensemble",
-            "Analyse client",
-            "Profils clients",
-            "Campagnes",
-            "Scores prédictifs",
-            "Plan d'investissement",
+            ":material/dashboard: Vue d'ensemble",
+            ":material/person_search: Analyse client",
+            ":material/groups: Profils clients",
+            ":material/campaign: Campagnes",
+            ":material/query_stats: Scores prédictifs",
+            ":material/account_balance_wallet: Plan d'investissement",
         ]
     )
 
@@ -162,26 +220,59 @@ def render_pilotage() -> None:
                 ("Campagnes", str(len(campaigns))),
             ]
         )
-        c1, c2 = st.columns(2)
-        if not monthly.empty:
-            fig = px.line(
-                monthly,
-                x="Date",
-                y="revenue",
-                title="Chiffre d'affaires mensuel",
-                color_discrete_sequence=PALETTE,
-            )
-            fig.update_layout(xaxis_title="Mois", yaxis_title="Chiffre d'affaires ($)")
-            c1.plotly_chart(style_chart(fig), width="stretch")
+        c1, c2 = st.columns(2, gap="large")
+
+        # Le profil sélectionné sous le camembert pilote le détail affiché sur la
+        # courbe mensuelle : on prépare donc le camembert et le sélecteur (c2)
+        # avant de rendre la courbe (c1), tout en gardant la courbe à gauche.
         pie_src = view.groupby("Segment_Label", as_index=False)["Monetary"].sum()
+        segment_color_map = {
+            label: PALETTE[i % len(PALETTE)] for i, label in enumerate(SEGMENT_LABELS.values())
+        }
         fig = px.pie(
             pie_src,
             names="Segment_Label",
             values="Monetary",
             title="Répartition du chiffre d'affaires par profil client",
-            color_discrete_sequence=PALETTE,
+            color="Segment_Label",
+            color_discrete_map=segment_color_map,
         )
+        fig.update_traces(hovertemplate="%{label}<br>%{value:,.0f} $<extra></extra>")
         c2.plotly_chart(style_chart(fig), width="stretch")
+        selected_label = c2.pills(
+            "Détail mensuel par profil",
+            options=pie_src["Segment_Label"].tolist(),
+            default=None,
+            key="pilotage_revenue_segment",
+            label_visibility="collapsed",
+        )
+        c2.caption(
+            "Sélectionnez un profil pour afficher son détail mensuel sur la courbe ; "
+            "cliquez à nouveau pour revenir à la vue globale."
+        )
+
+        monthly_by_segment = data.monthly_by_segment
+        if selected_label and not monthly_by_segment.empty:
+            detail = monthly_by_segment[monthly_by_segment["Segment_Label"] == selected_label]
+            line_title = f"Chiffre d'affaires mensuel · {selected_label}"
+            line_color = segment_color_map.get(selected_label, PALETTE[0])
+        else:
+            detail = monthly
+            line_title = "Chiffre d'affaires mensuel"
+            line_color = PALETTE[0]
+
+        if not detail.empty:
+            fig = px.line(
+                detail,
+                x="Date",
+                y="revenue",
+                title=line_title,
+                color_discrete_sequence=[line_color],
+            )
+            fig.update_layout(xaxis_title="Mois", yaxis_title="Chiffre d'affaires ($)")
+            c1.plotly_chart(style_chart(fig), width="stretch")
+        if selected_label:
+            c1.caption(f"Détail du profil sélectionné : **{selected_label}**.")
         if not by_channel.empty:
             fig = px.bar(
                 by_channel,
@@ -197,7 +288,7 @@ def render_pilotage() -> None:
 
     with tabs[1]:
         section_header("Comportement et valeur des clients", "customers")
-        c1, c2 = st.columns(2)
+        c1, c2 = st.columns(2, gap="large")
         if "Age" in view.columns and "Gender" in view.columns:
             fig = px.histogram(
                 view,
@@ -372,7 +463,7 @@ def render_pilotage() -> None:
                     ("Retour sur investissement global", f"{(campaigns['Attributed_Revenue'].sum() - tot_budget) / tot_budget:.2f}"),
                 ]
             )
-            c1, c2 = st.columns(2)
+            c1, c2 = st.columns(2, gap="large")
             fig = px.bar(
                 by_channel,
                 x="Channel",
@@ -478,7 +569,7 @@ def render_pilotage() -> None:
                     ("Valeur client future totale", money(float(scored_view["CLV_Pred"].sum()))),
                 ]
             )
-            c1, c2 = st.columns(2)
+            c1, c2 = st.columns(2, gap="large")
             hist_src = view.copy()
             fig = px.histogram(
                 hist_src,
@@ -507,7 +598,7 @@ def render_pilotage() -> None:
             fig.update_layout(showlegend=False, yaxis_title="Valeur client future ($)")
             c2.plotly_chart(style_chart(fig), width="stretch")
 
-            ic, il = st.columns(2)
+            ic, il = st.columns(2, gap="large")
             churn_importance = data.importance_churn.head(10).copy()
             churn_importance["feature"] = churn_importance["feature"].map(
                 FEATURE_LABELS
@@ -584,7 +675,7 @@ def render_pilotage() -> None:
                 f"Enveloppe {money(NEXT_BUDGET)} répartie selon la valeur future et le risque, "
                 "puis pondérée par le retour sur investissement historique des canaux."
             )
-            c1, c2 = st.columns(2)
+            c1, c2 = st.columns(2, gap="large")
             fig = px.bar(
                 strategy.sort_values("Budget_Recommended"),
                 x="Budget_Recommended",

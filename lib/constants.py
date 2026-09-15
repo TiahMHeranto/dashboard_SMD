@@ -6,7 +6,7 @@ PALETTE = ["#1B4F72", "#148F77", "#B9770E", "#922B21", "#6C3483", "#1A5276"]
 
 RISK_ORDER = ["Faible", "Moyen", "Eleve"]
 RISK_LABELS = {"Faible": "Faible", "Moyen": "Moyen", "Eleve": "Élevé"}
-RISK_COLORS = {"Faible": "#148F77", "Moyen": "#B9770E", "Eleve": "#922B21"}
+RISK_COLORS = {"Faible": "#16794A", "Moyen": "#FFFFFF", "Eleve": "#C94040"}
 
 SEGMENT_LABELS = {
     "VIP / Champions": "Clients à très haute valeur",

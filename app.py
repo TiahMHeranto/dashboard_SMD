@@ -19,6 +19,7 @@ from lib.data import load_bundle, missing_inputs  # noqa: E402
 from lib.models import load_pipelines  # noqa: E402
 from views.components import inject_theme  # noqa: E402
 from views.demonstration import render_demo  # noqa: E402
+from views.members import render_members  # noqa: E402
 from views.pilotage import render_pilotage  # noqa: E402
 
 
@@ -56,6 +57,12 @@ def main() -> None:
                 title="Évaluation client",
                 icon=":material/query_stats:",
                 url_path="scoring",
+            ),
+            st.Page(
+                render_members,
+                title="Membres du groupe",
+                icon=":material/groups:",
+                url_path="membres",
             ),
         ]
     )

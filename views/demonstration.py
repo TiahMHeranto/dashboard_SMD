@@ -14,7 +14,7 @@ from lib.constants import (
 )
 from lib.data import money, pct
 from lib.models import predict
-from views.components import page_header, section_header, style_chart
+from views.components import evaluation_theme, page_header, section_header, style_chart
 
 
 PRESETS = {
@@ -93,17 +93,22 @@ def render_demo() -> None:
     feats = data.features
     medians = data.train_medians
 
+    evaluation_theme()
     page_header(
         "Évaluation prédictive d'un client",
         "Estimez le risque d'attrition et la valeur future à partir du profil d'un client.",
         "model",
+        accent=True,
     )
 
     with st.sidebar:
         section_header("Sélection du client", "customers")
-        mode = st.radio(
-            "Source",
+        mode = st.segmented_control(
+            "Source du profil",
             ["Base clients", "Profil type", "Saisie libre"],
+            default="Base clients",
+            required=True,
+            width="stretch",
         )
         source_row = None
         preset_values = dict(medians)
@@ -143,8 +148,8 @@ def render_demo() -> None:
 
     with st.form("predict_form"):
         section_header("Profil à évaluer", "customers")
-        g1, g2, g3 = st.columns(3)
-        with g1:
+        g1, g2, g3 = st.columns(3, gap="large")
+        with g1, st.container(border=True):
             st.markdown("**Identité & ancienneté**")
             age = _number(
                 "Age", preset_values["Age"], min_v=18.0, max_v=80.0, step=1.0, fmt="%.0f", nonce=nonce
@@ -174,7 +179,7 @@ def render_demo() -> None:
                 fmt="%.0f",
                 nonce=nonce,
             )
-        with g2:
+        with g2, st.container(border=True):
             st.markdown("**Historique d'achat et panier**")
             frequency = _number(
                 "Frequency",
@@ -206,7 +211,7 @@ def render_demo() -> None:
                 help=FEATURE_HELP["Pct_Online"],
                 key=f"{nonce}_Pct_Online",
             )
-        with g3:
+        with g3, st.container(border=True):
             st.markdown("**Comportement d'achat**")
             n_cat = st.slider(
                 FEATURE_LABELS["N_Categories"],
@@ -252,8 +257,9 @@ def render_demo() -> None:
                 nonce=nonce,
             )
 
-        st.markdown("**Répartition par catégorie** (normalisée à 100 % lors du calcul)")
-        s1, s2, s3, s4 = st.columns(4)
+        st.divider()
+        st.markdown("**Répartition par catégorie** · normalisée à 100 % lors du calcul")
+        s1, s2, s3, s4 = st.columns(4, gap="large")
         shares = {}
         boxes = [s1, s2, s3, s4]
         for box, col in zip(boxes, SHARE_COLS):
@@ -309,7 +315,7 @@ def render_demo() -> None:
     st.divider()
     section_header("Résultat de l'évaluation", "insights")
 
-    left, right = st.columns(2)
+    left, right = st.columns(2, gap="large")
     with left:
         st.markdown("#### Risque d'attrition")
         st.metric("Probabilité d'attrition", pct(result["churn_proba"], 1))
@@ -379,7 +385,7 @@ def render_demo() -> None:
     saved = st.session_state.get("last_source")
     if saved and saved.get("Churn_Proba") is not None:
         st.subheader("Écart par rapport au score enregistré")
-        c1, c2 = st.columns(2)
+        c1, c2 = st.columns(2, gap="large")
         c1.metric(
             "Risque d'attrition simulé",
             pct(result["churn_proba"], 1),
