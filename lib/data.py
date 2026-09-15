@@ -211,7 +211,14 @@ def _strategy(scores: pd.DataFrame, by_channel: pd.DataFrame) -> tuple[pd.DataFr
     rows = []
     for _, r in seg.iterrows():
         name = str(r["Segment"])
-        channel, message = PLAYBOOK.get(name, ("Email", "Nurturing RFM, offre catégorie préférée"))
+        channel, message = PLAYBOOK.get(
+            name,
+            (
+                "Email",
+                "Suivi de la récence, de la fréquence et de la valeur avec une offre "
+                "adaptée à la catégorie préférée",
+            ),
+        )
         rows.append({"Segment": name, "Primary_Channel": channel, "Message": message})
     plan = seg.merge(pd.DataFrame(rows), on="Segment")
     plan["Alloc_Score"] = plan["clv"].fillna(0) * (0.5 + plan["churn"].fillna(0.2))

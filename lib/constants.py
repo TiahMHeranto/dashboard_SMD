@@ -9,48 +9,48 @@ RISK_LABELS = {"Faible": "Faible", "Moyen": "Moyen", "Eleve": "Élevé"}
 RISK_COLORS = {"Faible": "#148F77", "Moyen": "#B9770E", "Eleve": "#922B21"}
 
 SEGMENT_LABELS = {
-    "VIP / Champions": "VIP / Champions",
-    "Online reguliers (Clothing)": "Online réguliers (Clothing)",
-    "In-Store reguliers": "In-Store réguliers",
-    "Petits dormants (Accessoires)": "Petits dormants (Accessoires)",
-    "Gros paniers occasionnels (Outerwear)": "Gros paniers occasionnels (Outerwear)",
-    "Chaussures ponctuels": "Chaussures ponctuels",
+    "VIP / Champions": "Clients à très haute valeur",
+    "Online reguliers (Clothing)": "Clients en ligne réguliers · Vêtements",
+    "In-Store reguliers": "Clients réguliers en magasin",
+    "Petits dormants (Accessoires)": "Clients dormants · Accessoires",
+    "Gros paniers occasionnels (Outerwear)": "Gros paniers occasionnels · Vêtements d'extérieur",
+    "Chaussures ponctuels": "Acheteurs occasionnels · Chaussures",
 }
 
 PLAYBOOK = {
     "VIP / Champions": (
         "Email",
-        "Concierge, avant-première, cashback statut — pas de braderie",
+        "Conciergerie, avant-première et avantage de statut, sans remise massive",
     ),
     "Online reguliers (Clothing)": (
         "Social",
-        "UGC, visuel Clothing, retargeting visiteurs Online",
+        "Contenus clients, visuels de vêtements et reciblage des visiteurs en ligne",
     ),
     "In-Store reguliers": (
         "In-Store",
-        "Coupons / QR pont digital, fidélité magasin",
+        "Coupons avec code à scanner, passerelle numérique et fidélité en magasin",
     ),
     "Petits dormants (Accessoires)": (
         "Email",
-        "Win-back 15 % une fois, preuve sociale, deadline 10 j",
+        "Réactivation avec 15 % de remise unique, preuve sociale et délai de 10 jours",
     ),
     "Gros paniers occasionnels (Outerwear)": (
         "Online",
-        "Reminder panier / look complet, urgence légère",
+        "Rappel du panier, tenue complète et urgence modérée",
     ),
     "Chaussures ponctuels": (
         "Email",
-        "Cross-sell et relance au renouvellement",
+        "Vente croisée et relance au renouvellement",
     ),
 }
 
 PERSONA_BLURB = {
-    "VIP / Champions": "Cœur de CA (11,6 % des clients, 41,4 % du chiffre). Fidéliser par le statut, pas par la remise.",
-    "Online reguliers (Clothing)": "Plus gros volume. Digital-first, Clothing dominant. Social + checkout mobile.",
-    "In-Store reguliers": "100 % magasin, panier régulier. Pont magasin–digital plutôt que paid agressif.",
-    "Petits dormants (Accessoires)": "Récence élevée, petits paniers Accessoires. Réactivation Email seulement si ROI positif.",
-    "Gros paniers occasionnels (Outerwear)": "Peu d'achats mais AOV élevé, Outerwear. Relance avant-saison, pas de promo continue.",
-    "Chaussures ponctuels": "Niche Footwear. Cross-sell et relance au renouvellement, canal Email.",
+    "VIP / Champions": "Cœur du chiffre d'affaires : 11,6 % des clients et 41,4 % du revenu. Fidéliser par le statut, pas par la remise.",
+    "Online reguliers (Clothing)": "Plus gros volume. Parcours numérique prioritaire et vêtements dominants. Réseaux sociaux et paiement mobile.",
+    "In-Store reguliers": "Achats exclusivement en magasin et panier régulier. Créer un pont entre magasin et numérique.",
+    "Petits dormants (Accessoires)": "Récence élevée et petits paniers d'accessoires. Réactivation par courrier électronique si elle reste rentable.",
+    "Gros paniers occasionnels (Outerwear)": "Peu d'achats mais panier moyen élevé, dominé par les vêtements d'extérieur. Relance avant-saison.",
+    "Chaussures ponctuels": "Segment spécialisé dans les chaussures. Vente croisée et relance au renouvellement par courrier électronique.",
 }
 
 FEATURE_LABELS = {
@@ -58,19 +58,19 @@ FEATURE_LABELS = {
     "Gender_Male": "Genre (homme)",
     "Tenure_Days": "Ancienneté (jours)",
     "Recency": "Récence (jours)",
-    "Frequency": "Fréquence (tickets)",
-    "Monetary": "CA historique ($)",
+    "Frequency": "Nombre de transactions",
+    "Monetary": "Chiffre d'affaires historique ($)",
     "AOV": "Panier moyen ($)",
-    "Pct_Online": "Part des achats Online",
-    "N_Categories": "Nb de catégories",
-    "N_Products": "Nb de produits distincts",
-    "Avg_Basket_Qty": "Qté moyenne / ticket",
+    "Pct_Online": "Part des achats en ligne",
+    "N_Categories": "Nombre de catégories",
+    "N_Products": "Nombre de produits distincts",
+    "Avg_Basket_Qty": "Quantité moyenne par transaction",
     "Avg_Discount": "Remise moyenne",
     "Avg_Days_Between": "Jours moyens entre achats",
-    "Share_Accessories": "Part Accessories",
-    "Share_Clothing": "Part Clothing",
-    "Share_Footwear": "Part Footwear",
-    "Share_Outerwear": "Part Outerwear",
+    "Share_Accessories": "Part des accessoires",
+    "Share_Clothing": "Part des vêtements",
+    "Share_Footwear": "Part des chaussures",
+    "Share_Outerwear": "Part des vêtements d'extérieur",
 }
 
 FEATURE_HELP = {
@@ -80,17 +80,17 @@ FEATURE_HELP = {
     "Recency": "Jours depuis le dernier achat.",
     "Frequency": "Nombre de tickets sur l'historique disponible.",
     "Monetary": "Chiffre d'affaires historique du client.",
-    "AOV": "Panier moyen (CA / nombre de tickets).",
-    "Pct_Online": "Part des tickets canal Online (0 = tout magasin, 1 = tout web).",
+    "AOV": "Panier moyen : chiffre d'affaires divisé par le nombre de transactions.",
+    "Pct_Online": "Part des transactions réalisées en ligne : 0 pour tout en magasin, 1 pour tout sur le site.",
     "N_Categories": "Catégories distinctes achetées (1 à 4).",
-    "N_Products": "SKU distincts achetés.",
-    "Avg_Basket_Qty": "Quantité moyenne d'articles par ticket.",
-    "Avg_Discount": "Remise moyenne vs prix catalogue.",
-    "Avg_Days_Between": "Écart moyen entre deux tickets. Si un seul achat : égal à la récence.",
-    "Share_Accessories": "Part du CA Accessories (les 4 parts devraient sommer à 1).",
-    "Share_Clothing": "Part du CA Clothing.",
-    "Share_Footwear": "Part du CA Footwear.",
-    "Share_Outerwear": "Part du CA Outerwear.",
+    "N_Products": "Nombre de références produit distinctes achetées.",
+    "Avg_Basket_Qty": "Quantité moyenne d'articles par transaction.",
+    "Avg_Discount": "Remise moyenne par rapport au prix catalogue.",
+    "Avg_Days_Between": "Écart moyen entre deux transactions. Pour un achat unique, il est égal à la récence.",
+    "Share_Accessories": "Part du chiffre d'affaires consacrée aux accessoires.",
+    "Share_Clothing": "Part du chiffre d'affaires consacrée aux vêtements.",
+    "Share_Footwear": "Part du chiffre d'affaires consacrée aux chaussures.",
+    "Share_Outerwear": "Part du chiffre d'affaires consacrée aux vêtements d'extérieur.",
 }
 
 SHARE_COLS = [
@@ -101,6 +101,13 @@ SHARE_COLS = [
 ]
 
 CHANNEL_ORDER = ["Email", "Social", "Online", "In-Store", "TV"]
+CHANNEL_LABELS = {
+    "Email": "Courrier électronique",
+    "Social": "Réseaux sociaux",
+    "Online": "En ligne",
+    "In-Store": "En magasin",
+    "TV": "Télévision",
+}
 
 NEXT_BUDGET = 150_000
 

@@ -12,12 +12,12 @@ sys.path.insert(0, str(HERE))
 
 st.set_page_config(
     page_title="Pilotage marketing",
-    page_icon="📊",
     layout="wide",
 )
 
 from lib.data import load_bundle, missing_inputs  # noqa: E402
 from lib.models import load_pipelines  # noqa: E402
+from views.components import inject_theme  # noqa: E402
 from views.demonstration import render_demo  # noqa: E402
 from views.pilotage import render_pilotage  # noqa: E402
 
@@ -40,31 +40,21 @@ def main() -> None:
 
     st.session_state["bundle"] = _cached_bundle()
     st.session_state["pipelines"] = _cached_pipelines()
-    st.markdown(
-        """
-        <style>
-        #MainMenu {visibility: hidden;}
-        header[data-testid="stHeader"] {background: transparent;}
-        footer {visibility: hidden;}
-        .stAppDeployButton {display: none;}
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    inject_theme()
 
     page = st.navigation(
         [
             st.Page(
                 render_pilotage,
                 title="Pilotage",
-                icon="📊",
+                icon=":material/space_dashboard:",
                 default=True,
                 url_path="pilotage",
             ),
             st.Page(
                 render_demo,
-                title="Scoring client",
-                icon="🎯",
+                title="Évaluation client",
+                icon=":material/query_stats:",
                 url_path="scoring",
             ),
         ]

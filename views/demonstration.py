@@ -14,6 +14,7 @@ from lib.constants import (
 )
 from lib.data import money, pct
 from lib.models import predict
+from views.components import page_header, section_header, style_chart
 
 
 PRESETS = {
@@ -37,7 +38,7 @@ PRESETS = {
         "Share_Footwear": 0.0,
         "Share_Outerwear": 0.0,
     },
-    "Client VIP": {
+    "Client à très haute valeur": {
         "Age": 34,
         "Gender_Male": 0,
         "Tenure_Days": 800,
@@ -92,11 +93,14 @@ def render_demo() -> None:
     feats = data.features
     medians = data.train_medians
 
-    st.title("Scoring client")
-    st.caption("Estimez le risque de churn et la valeur future à partir du profil d'un client.")
+    page_header(
+        "Évaluation prédictive d'un client",
+        "Estimez le risque d'attrition et la valeur future à partir du profil d'un client.",
+        "model",
+    )
 
     with st.sidebar:
-        st.header("Client")
+        section_header("Sélection du client", "customers")
         mode = st.radio(
             "Source",
             ["Base clients", "Profil type", "Saisie libre"],
@@ -117,8 +121,8 @@ def render_demo() -> None:
             preset_values = _defaults_from_row(source_row, cols)
             st.caption(
                 f"{source_row['Name']} · {source_row.get('Segment_Label', '')} · "
-                f"score actuel : churn {source_row['Churn_Proba']:.1%} · "
-                f"CLV {source_row['CLV_Pred']:.0f} $"
+                f"risque d'attrition actuel : {source_row['Churn_Proba']:.1%} · "
+                f"valeur client future : {source_row['CLV_Pred']:.0f} $"
             )
         elif mode == "Profil type":
             preset_name = st.selectbox("Profil", list(PRESETS.keys()))
@@ -138,7 +142,7 @@ def render_demo() -> None:
         nonce = "libre"
 
     with st.form("predict_form"):
-        st.subheader("Profil")
+        section_header("Profil à évaluer", "customers")
         g1, g2, g3 = st.columns(3)
         with g1:
             st.markdown("**Identité & ancienneté**")
@@ -171,7 +175,7 @@ def render_demo() -> None:
                 nonce=nonce,
             )
         with g2:
-            st.markdown("**RFM & panier**")
+            st.markdown("**Historique d'achat et panier**")
             frequency = _number(
                 "Frequency",
                 preset_values["Frequency"],
@@ -248,7 +252,7 @@ def render_demo() -> None:
                 nonce=nonce,
             )
 
-        st.markdown("**Mix catégorie** (recalé à 100 % au calcul)")
+        st.markdown("**Répartition par catégorie** (normalisée à 100 % lors du calcul)")
         s1, s2, s3, s4 = st.columns(4)
         shares = {}
         boxes = [s1, s2, s3, s4]
@@ -264,7 +268,11 @@ def render_demo() -> None:
                     key=f"{nonce}_{col}",
                 )
 
-        submitted = st.form_submit_button("Calculer les scores", type="primary")
+        submitted = st.form_submit_button(
+            "Calculer les scores",
+            type="primary",
+            icon=":material/calculate:",
+        )
 
     values = {
         "Age": age,
@@ -299,12 +307,12 @@ def render_demo() -> None:
         return
 
     st.divider()
-    st.subheader("Résultat")
+    section_header("Résultat de l'évaluation", "insights")
 
     left, right = st.columns(2)
     with left:
-        st.markdown("#### Churn")
-        st.metric("Probabilité de churn", pct(result["churn_proba"], 1))
+        st.markdown("#### Risque d'attrition")
+        st.metric("Probabilité d'attrition", pct(result["churn_proba"], 1))
         st.metric("Décision", "À risque" if result["churn_flag"] else "Stable")
         st.metric("Palier de risque", result["risk_label"])
         fig = go.Figure(
@@ -312,7 +320,7 @@ def render_demo() -> None:
                 mode="gauge+number",
                 value=result["churn_proba"] * 100,
                 number={"suffix": " %", "valueformat": ".1f"},
-                title={"text": "Score churn"},
+                title={"text": "Score d'attrition"},
                 gauge={
                     "axis": {"range": [0, 100]},
                     "bar": {"color": PALETTE[0]},
@@ -330,14 +338,18 @@ def render_demo() -> None:
             )
         )
         fig.update_layout(height=260, margin=dict(t=40, b=20, l=30, r=30))
-        st.plotly_chart(fig, width="stretch")
+        st.plotly_chart(style_chart(fig, height=260), width="stretch")
         st.caption("Trait rouge : seuil d'alerte.")
 
     with right:
-        st.markdown("#### Valeur client (CLV)")
-        st.metric("CLV estimée (12 mois)", money(result["clv_pred"]))
+        st.markdown("#### Valeur client future")
+        st.metric("Valeur estimée sur 12 mois", money(result["clv_pred"]))
+        value_importance = data.importance_clv.head(8).copy()
+        value_importance["feature"] = value_importance["feature"].map(
+            FEATURE_LABELS
+        ).fillna(value_importance["feature"])
         fig = px.bar(
-            data.importance_clv.head(8).sort_values("importance"),
+            value_importance.sort_values("importance"),
             x="importance",
             y="feature",
             orientation="h",
@@ -345,35 +357,36 @@ def render_demo() -> None:
             color_discrete_sequence=[PALETTE[2]],
         )
         fig.update_layout(height=280, margin=dict(t=50, b=20), yaxis_title="")
-        st.plotly_chart(fig, width="stretch")
+        st.plotly_chart(style_chart(fig, height=280), width="stretch")
 
     if result["churn_flag"] and result["clv_pred"] >= 400:
         st.warning(
-            "Win-back prioritaire : risque au-dessus du seuil et valeur encore élevée. "
-            "Canal recommandé : Email, offre unique datée."
+            "Réactivation prioritaire : le risque dépasse le seuil et la valeur reste élevée. "
+            "Canal recommandé : courrier électronique avec une offre unique et datée."
         )
     elif result["churn_flag"]:
         st.info(
-            "Risque élevé mais CLV limitée : tunnel low-cost (email), pas d'investissement média fort."
+            "Risque élevé mais valeur future limitée : parcours à faible coût par courrier "
+            "électronique, sans investissement média important."
         )
     elif result["risk_tier"] == "Moyen":
         st.info("Palier moyen : sous le seuil d'alerte, à surveiller.")
     elif result["clv_pred"] >= 1500:
-        st.success("Client de valeur, risque contenu : privilégier fidélisation / statut, pas la remise.")
+        st.success("Client de valeur, risque contenu : privilégier la fidélisation et le statut, pas la remise.")
     else:
-        st.info("Risque faible. Suivi RFM standard.")
+        st.info("Risque faible. Maintenir le suivi habituel de la récence, de la fréquence et de la valeur.")
 
     saved = st.session_state.get("last_source")
     if saved and saved.get("Churn_Proba") is not None:
-        st.subheader("Écart vs score en base")
+        st.subheader("Écart par rapport au score enregistré")
         c1, c2 = st.columns(2)
         c1.metric(
-            "Churn simulé",
+            "Risque d'attrition simulé",
             pct(result["churn_proba"], 1),
             delta=pct(result["churn_proba"] - float(saved["Churn_Proba"]), 1),
         )
         c2.metric(
-            "CLV simulée",
+            "Valeur client future simulée",
             money(result["clv_pred"]),
             delta=money(result["clv_pred"] - float(saved["CLV_Pred"])),
         )
